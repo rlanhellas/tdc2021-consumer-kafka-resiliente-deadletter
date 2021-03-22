@@ -41,19 +41,8 @@ public class ConsumidorCliente {
                          Acknowledgment ack) {
         try {
             logger.info("Iniciando consumo do tópico {}, key {}, Cpf Cliente {}", topico, key, cliente.getCpf());
-
-            if (cliente.getCpf().contains("ERRO")) {
-
-                if (!enviarParaDLQ(cliente, topico, "CPF possui caracteres inválidos")) {
-                    ack.nack(tempoNackMs);
-                }else{
-                    commit(ack);
-                }
-            }else {
-                clienteRepositorio.save(cliente);
-                commit(ack);
-            }
-
+            clienteRepositorio.save(cliente);
+            commit(ack);
         } catch (Exception e) {
             /*
              * Se ocorrer um erro de conexão com a base (ex: timeout por firewall, credenciais inválidas ..) então tentaremos
@@ -76,7 +65,7 @@ public class ConsumidorCliente {
         }
     }
 
-    private void commit(Acknowledgment ack){
+    private void commit(Acknowledgment ack) {
         ack.acknowledge();
         logger.info("Commit realizado");
     }
